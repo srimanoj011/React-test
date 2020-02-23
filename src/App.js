@@ -1,26 +1,47 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Provider } from "react-redux"
+import { PersistGate } from "redux-persist/integration/react"
 
-function App() {
+import { ConnectedRouter as Router } from "connected-react-router"
+import { Switch, Route, Redirect } from "react-router-dom"
+import ProtectedRoute from "./ProtectedRoute"
+import './App.css';
+import store, { history, persistor } from './store';
+import Products from "./components/products/Products"
+import Login from "./components/login/login"
+
+/**
+ * Handled basic validations
+ */
+
+
+function Routes() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router history={history}>
+      <Switch>
+        <Route path="/login" component={Login} />
+        <ProtectedRoute path="/products" component={Products} />
+        <Route
+          path="/"
+          exact
+          render={props => <Redirect to="/products" {...props} />}
+        />
+      </Switch>
+    </Router>
   );
+}
+
+
+class App extends React.Component {
+  render() {
+    return (
+      <Provider store={store}>
+        <PersistGate persistor={persistor}>
+          <Routes />
+        </PersistGate>
+      </Provider>
+    )
+  }
 }
 
 export default App;
